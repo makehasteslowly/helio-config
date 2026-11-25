@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Helio</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,system-ui,sans-serif;background:#f2f1ed;color:#111;padding:20px;max-width:420px;margin:0 auto}
+.t{font-size:20px;text-align:center;margin-bottom:28px;font-weight:300;letter-spacing:4px;color:#666}
+.s{margin-bottom:24px}
+.l{font-size:12px;color:#666;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;font-weight:600}
+.g{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.b{padding:12px 4px 10px;border:2px solid #ccc;border-radius:12px;background:#fff;color:#666;text-align:center;cursor:pointer;font-size:12px;font-weight:500;transition:all .15s}
+.b.a{border-color:#111;color:#111;background:#fff;font-weight:700}
+.d{width:28px;height:28px;border-radius:50%;margin:0 auto 8px;border:2px solid #bbb}
+input[type=number]{width:100%;padding:14px;background:#fff;border:2px solid #ccc;border-radius:12px;color:#111;font-size:16px;-webkit-appearance:none}
+input:focus{border-color:#888;outline:none}
+.h{font-size:12px;color:#888;margin-top:8px}
+.tog{display:flex;align-items:center;justify-content:space-between;padding:14px;background:#fff;border:2px solid #ccc;border-radius:12px}
+.tog span{font-size:15px;font-weight:500}
+.sw{position:relative;width:48px;height:28px;cursor:pointer}
+.sw input{opacity:0;width:0;height:0}
+.sl{position:absolute;top:0;left:0;right:0;bottom:0;background:#ccc;border-radius:14px;transition:.2s}
+.sl:before{content:"";position:absolute;height:22px;width:22px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.sw input:checked+.sl{background:#111}
+.sw input:checked+.sl:before{transform:translateX(20px);background:#fff}
+.sv{display:block;width:100%;padding:16px;background:#111;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;margin-top:24px;letter-spacing:.5px}
+</style>
+</head>
+<body>
+<div class="t">H E L I O</div>
+<div class="s">
+  <div class="l">Theme</div>
+  <div class="g" id="themes"></div>
+</div>
+<div class="s">
+  <div class="l">Latitude</div>
+  <input type="number" id="lat" step="0.1" min="-90" max="90">
+  <div class="h">Your latitude for accurate sunrise &amp; sunset times</div>
+</div>
+<div class="s">
+  <div class="l">Display</div>
+  <div class="tog">
+    <span>Next Event</span>
+    <label class="sw"><input type="checkbox" id="ev"><span class="sl"></span></label>
+  </div>
+  <div class="h">Show upcoming solar event icon &amp; time</div>
+</div>
+<button class="sv" onclick="save()">Save</button>
+<script>
+var THEMES = [
+  {name:'Deco',   sub:'Dark',  accent:'#FFD23F', border:'#ccc'},
+  {name:'Nouveau',sub:'Dark',  accent:'#C9A36B', border:'#ccc'},
+  {name:'Atomic', sub:'Dark',  accent:'#5CC8BA', border:'#ccc'},
+  {name:'Deco',   sub:'Light', accent:'#FFD23F', border:'#e0ddd6'},
+  {name:'Nouveau',sub:'Light', accent:'#C9A36B', border:'#e0ddd6'},
+  {name:'Atomic', sub:'Light', accent:'#5CC8BA', border:'#e0ddd6'}
+];
+
+var params = new URLSearchParams(location.search);
+var theme = parseInt(params.get('theme')) || 0;
+var lat = parseFloat(params.get('lat')) || 40;
+var ev = params.get('ev') !== '0';
+
+function render() {
+  var g = document.getElementById('themes');
+  g.innerHTML = '';
+  for (var i = 0; i < THEMES.length; i++) {
+    var t = THEMES[i];
+    var el = document.createElement('div');
+    el.className = 'b' + (theme === i ? ' a' : '');
+    el.innerHTML = '<div class="d" style="background:' + t.accent + ';border-color:' + t.border + '"></div>'
+      + t.name + '<br><span style="font-size:10px;color:#888">' + t.sub + '</span>';
+    el.setAttribute('data-i', i);
+    el.addEventListener('click', function() { pick(parseInt(this.getAttribute('data-i'))); });
+    g.appendChild(el);
+  }
+  document.getElementById('lat').value = lat;
+  document.getElementById('ev').checked = ev;
+}
+
+function pick(t) {
+  theme = t;
+  var bs = document.querySelectorAll('.b');
+  for (var i = 0; i < bs.length; i++)
+    bs[i].className = 'b' + (i === t ? ' a' : '');
+}
+
+function save() {
+  var o = {
+    theme: theme,
+    latitude: parseFloat(document.getElementById('lat').value) || 40,
+    showEvent: document.getElementById('ev').checked
+  };
+  var data = encodeURIComponent(JSON.stringify(o));
+  location.href = 'pebblekit-js://close#' + data;
+}
+
+render();
+</script>
+</body>
+</html>
