@@ -94,24 +94,8 @@ function save() {
     showEvent: document.getElementById('ev').checked
   };
   var data = encodeURIComponent(JSON.stringify(o));
-  var url = 'pebblekit-js://close#' + data;
-
-  // Try direct scheme first (works in Pebble's own WebView)
-  location.href = url;
-
-  // If still here after 500ms, Chrome blocked the scheme —
-  // try Android Intent URL which Chrome can dispatch to apps
-  setTimeout(function() {
-    location.href = 'intent://close#' + data
-      + '#Intent;scheme=pebblekit-js;end';
-  }, 500);
-
-  // If still here, show confirmation and ask user to close
-  setTimeout(function() {
-    document.querySelector('.sv').textContent = 'Saved! Close this page.';
-    document.querySelector('.sv').style.background = '#4a4';
-    document.querySelector('.sv').onclick = function() { window.close(); };
-  }, 1200);
+  var ret = new URLSearchParams(location.search).get('return_to') || 'pebblejs://close#';
+  location.href = ret + data;
 }
 
 render();
