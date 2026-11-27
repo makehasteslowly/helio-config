@@ -45,7 +45,12 @@ input:focus{border-color:#888;outline:none}
     <span>Next Event</span>
     <label class="sw"><input type="checkbox" id="ev"><span class="sl"></span></label>
   </div>
-  <div class="h">Show upcoming solar event icon &amp; time</div>
+  <div class="h">Show upcoming solar event marker &amp; time</div>
+  <div class="tog" style="margin-top:8px">
+    <span>Digital Clock</span>
+    <label class="sw"><input type="checkbox" id="dg"><span class="sl"></span></label>
+  </div>
+  <div class="h">Show time as digits instead of analog hands</div>
 </div>
 <button class="sv" onclick="save()">Save</button>
 <script>
@@ -62,6 +67,7 @@ var params = new URLSearchParams(location.search);
 var theme = parseInt(params.get('theme')) || 0;
 var lat = parseFloat(params.get('lat')) || 40;
 var ev = params.get('ev') !== '0';
+var dg = params.get('dg') === '1';
 
 function render() {
   var g = document.getElementById('themes');
@@ -78,6 +84,7 @@ function render() {
   }
   document.getElementById('lat').value = lat;
   document.getElementById('ev').checked = ev;
+  document.getElementById('dg').checked = dg;
 }
 
 function pick(t) {
@@ -91,7 +98,8 @@ function save() {
   var o = {
     theme: theme,
     latitude: parseFloat(document.getElementById('lat').value) || 40,
-    showEvent: document.getElementById('ev').checked
+    showEvent: document.getElementById('ev').checked,
+    digital: document.getElementById('dg').checked
   };
   var data = encodeURIComponent(JSON.stringify(o));
   var ret = new URLSearchParams(location.search).get('return_to') || 'pebblejs://close#';
